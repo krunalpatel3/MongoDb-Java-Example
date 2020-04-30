@@ -8,5 +8,5 @@ How to use MongoDb in java Insert,Update,Delete,Query.
 4) How to delete by some condition and also delete many records and single record.
 
 #### Note:-
-This project is made in intellij so if you try to open in android studio it may not open. 
+This project is made in Intellij  so if you try to open in Android Studio it may not open. 
 
