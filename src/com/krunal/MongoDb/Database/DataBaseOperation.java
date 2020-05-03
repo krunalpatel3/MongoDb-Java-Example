@@ -9,24 +9,33 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import static com.krunal.MongoDb.Utility.*;
 import static com.mongodb.client.model.Filters.and;
 
 public class DataBaseOperation {
 
     public static void InsertMany() {
+
         MongoCollection<Document> TestCollection1 = MongoDbClient.getInstance()
                 .getCollection("Test");
 
-
         List<Document> insertMany = new ArrayList<>();
-        insertMany.add(new Document("Name", "Jay").append("age", 30));
-        insertMany.add(new Document("Name", "neel").append("age", 33));
-        insertMany.add(new Document("Name", "neel").append("age", 44));
-        insertMany.add(new Document("Name", "neel").append("age", 45));
-        insertMany.add(new Document("Name", "Karan").append("age", 100));
+        insertMany.add(new Document("Name", "Jay").append("age", 30)
+                .append("Birthday",getDateFromDD_MM_YYYY("02/03/1996")));
+        insertMany.add(new Document("Name", "neel").append("age", 33)
+                .append("Birthday",getDateFromDD_MM_YYYY("10/06/1998")));
+        insertMany.add(new Document("Name", "neel").append("age", 44)
+                .append("Birthday",getDateFromDD_MM_YYYY("27/05/1996")));
+        insertMany.add(new Document("Name", "neel").append("age", 45)
+                .append("Birthday",getDateFromDD_MM_YYYY("04/05/1992")));
+        insertMany.add(new Document("Name", "Karan").append("age", 100)
+                .append("Birthday",getDateFromDD_MM_YYYY("01/01/1991")));
+
 
         TestCollection1.insertMany(insertMany);
     }
@@ -36,7 +45,9 @@ public class DataBaseOperation {
         MongoCollection<Document> TestCollection1 = MongoDbClient.getInstance()
                 .getCollection("Test");
 
-        TestCollection1.insertOne(new Document("Name", "meet").append("age", 34));
+        // To insert current Datetime.
+        TestCollection1.insertOne(new Document("Name", "meet").append("age", 34)
+                .append("Birthday",new Date()));
     }
 
     public static void findOne() {
@@ -65,7 +76,7 @@ public class DataBaseOperation {
     }
 
     public static void findOneByCondition() {
-        // Delete Many By name Document Object.
+
         // Select * from Test where Name = 'neel' and age > 36
 
         MongoCollection<Document> TestCollection1 = MongoDbClient.getInstance()
@@ -95,8 +106,39 @@ public class DataBaseOperation {
 
     }
 
+    public static void findByDate() {
+
+        // Select * from Test where Birthday BETWEEN '1992-05-04' AND '1996-05-27'
+
+        MongoCollection<Document> TestCollection1 = MongoDbClient.getInstance()
+                .getCollection("Test");
+
+        Document query = Document.parse("{Birthday: {$gte: ISODate('"
+                + queryDateConversion("04/05/1992") + "')"
+                +", $lte: ISODate('" + queryDateConversion("27/05/1996") + "')}}");
+
+        FindIterable<Document> list = TestCollection1.find(query);
+
+        try {
+            if (list != null){
+                for (Document item : list){
+                    System.out.println("_id:- " + item.get("_id"));
+                    System.out.println("Birthday:- " + getDD_MM_YYYYFromDate((Date)
+                            item.get("Birthday")));
+                    System.out.println("Name:- " + item.get("Name"));
+                    System.out.println("age:- " + item.get("age"));
+                    System.out.println("---------------------------------------");
+                }
+            }
+        }catch (Exception e){
+            System.out.println("Exception:- " + e.getMessage());
+
+        }
+
+    }
+
     public static void findAll() {
-        // Delete Many By name Document Object.
+
         // Select * from Test
 
         MongoCollection<Document> TestCollection1 = MongoDbClient.getInstance()
@@ -104,22 +146,26 @@ public class DataBaseOperation {
 
         FindIterable<Document> list = TestCollection1.find();
 
-        MongoCursor<Document> cursor = list.iterator();
-
         try {
-            while (cursor.hasNext()) {
-                System.out.println(cursor.next());
+            if (list != null){
+                for (Document item : list){
+                    System.out.println("_id:- " + item.get("_id"));
+                    System.out.println("Birthday:- " + getDD_MM_YYYYFromDate((Date)
+                            item.get("Birthday")));
+                    System.out.println("Name:- " + item.get("Name"));
+                    System.out.println("age:- " + item.get("age"));
+                    System.out.println("---------------------------------------");
+                }
             }
-        } finally {
-            cursor.close();
+        }catch (Exception e){
+            System.out.println("Exception:- " + e.getMessage());
+
         }
-
-
     }
 
 
     public static void UpdateOneByName() {
-        // Delete Many By name Document Object.
+
         // UPDATE Test SET age = 98, Name = 'Karan patel' where Name IN (SELECT Name
         //                FROM Test
         //                WHERE Name = 'Karan'
@@ -142,7 +188,7 @@ public class DataBaseOperation {
     }
 
     public static void UpdateOneByMultipleCondition() {
-        // Delete Many By name Document Object.
+
         // UPDATE  Test SET age = 98, Name = 'Karan patel' where Name = 'neel' and age = 33
 
         MongoCollection<Document> TestCollection1 = MongoDbClient.getInstance()
@@ -162,7 +208,7 @@ public class DataBaseOperation {
 
 
     public static void UpdateManyByName() {
-        // Delete Many By name Document Object.
+
         // UPDATE  Test SET age = 98, Name = 'Karan patel' where Name = 'Karan'
 
         MongoCollection<Document> TestCollection1 = MongoDbClient.getInstance()
@@ -214,6 +260,14 @@ public class DataBaseOperation {
 
 
         TestCollection1.deleteMany(new Document("Name", "neel"));
+    }
+
+
+    public static void Drop_Test_Collection(){
+
+        MongoCollection<Document> TestCollection1 = MongoDbClient.getInstance()
+                .getCollection("Test");
+        TestCollection1.drop();
     }
 
 

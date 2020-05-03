@@ -20,6 +20,7 @@ public class Main {
         DataBaseOperation.findOne();
         DataBaseOperation.findOneByCondition();
         DataBaseOperation.findAll();
+        DataBaseOperation.findByDate();
 
         DataBaseOperation.UpdateOneByName();
         DataBaseOperation.UpdateOneByMultipleCondition();
@@ -28,6 +29,9 @@ public class Main {
         DataBaseOperation.DeleteOne();
         DataBaseOperation.DeleteOneByName();
         DataBaseOperation.DeleteManyByName();
+
+        // Drop_Test_Collection
+//        DataBaseOperation.Drop_Test_Collection();
 
 
 //        Gson gson2 = new Gson();
